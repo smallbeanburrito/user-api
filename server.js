@@ -42,6 +42,7 @@ app.post("/api/user/login", (req, res) => {
         userName: user.userName,
       };
       let token = jwt.sign(payload, jwtOptions.secretOrKey);
+      res.status(200);
       res.json({ message: "login successful", token: token });
     })
     .catch((msg) => {
