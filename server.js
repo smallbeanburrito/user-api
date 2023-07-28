@@ -12,10 +12,22 @@ const HTTP_PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 app.use(cors());
-app.use(passport.initialize());
 
 let ExtractJwt = passportJWT.ExtractJwt;
 let JwtStrategy = passportJWT.Strategy;
+
+let strategy = new JwtStrategy(jwtOptions, function (jwt_payload, next) {
+  console.log("payload received", jwt_payload);
+
+  if (jwt_payload) {
+    next(null, { _id: jwt_payload._id, userName: jwt_payload.userName });
+  } else {
+    next(null, false);
+  }
+});
+
+passport.use(strategy);
+app.use(passport.initialize());
 
 let jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme("jwt"),
@@ -42,7 +54,6 @@ app.post("/api/user/login", (req, res) => {
         userName: user.userName,
       };
       let token = jwt.sign(payload, jwtOptions.secretOrKey);
-      res.status(200);
       res.json({ message: "login successful", token: token });
     })
     .catch((msg) => {
