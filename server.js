@@ -16,6 +16,11 @@ app.use(cors());
 let ExtractJwt = passportJWT.ExtractJwt;
 let JwtStrategy = passportJWT.Strategy;
 
+let jwtOptions = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme("jwt"),
+  secretOrKey: process.env.JWT_SECRET,
+};
+
 let strategy = new JwtStrategy(jwtOptions, function (jwt_payload, next) {
   console.log("payload received", jwt_payload);
 
@@ -28,11 +33,6 @@ let strategy = new JwtStrategy(jwtOptions, function (jwt_payload, next) {
 
 passport.use(strategy);
 app.use(passport.initialize());
-
-let jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme("jwt"),
-  secretOrKey: process.env.JWT_SECRET,
-};
 
 app.post("/api/user/register", (req, res) => {
   userService
